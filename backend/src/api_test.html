@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+
+        <p>Simple API tester</p>
+
+        <form id="headers_form">
+            <table style="width:500px; border:1px solid black">
+                <caption>Get Headers</caption>
+                <tr><td style="width:300px">Authorization</td><td><input type="text" name="authz" size="12" value="BrianIsHere"></td></tr>
+            </table>
+            <input type="button" onclick="get_headers()" value="Get Headers">
+        </form>    
+
+        <hr>
+        <form id="headers_results">
+            <table style="width:500px; border:1px solid black">
+                <caption>Sent Headers</caption>
+                <tr><td><p id="sent_headers"></p></td></tr>
+            </table>
+            <table style="width:500px; border:1px solid black">
+                <caption>Observed Headers</caption>
+                <tr><td><p id="headers"></p></td></tr>
+            </table>
+            <input type="button" onclick="clear_headers()" value="Clear Headers">
+        </form>    
+
+        <script>
+
+            function get_headers() {
+                d = document.getElementById("headers_form").elements;
+                authz = d[0].value
+                apiurl = "/headers"
+                headers = {"Authorization": authz}
+                document.getElementById("headers").innerHTML = "Getting Headers";
+                document.getElementById("sent_headers").innerHTML = "<pre>" + JSON.stringify(headers) + "<pre>";
+                fetch(apiurl, {headers: headers})
+                    .then(response => response.json())
+                    .then(data => document.getElementById("headers").innerHTML = "<pre>" + JSON.stringify(data, null, "  ") + "</pre>")
+                    .catch(error => document.getElementById("headers").innerHTML = "There was an error: " + error)
+            }
+
+            function clear_headers() {
+                document.getElementById("sent_headers").innerHTML = "";
+                document.getElementById("headers").innerHTML = "";
+            }
+
+        </script>
+
+    </body>
+</html>

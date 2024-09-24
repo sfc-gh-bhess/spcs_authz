@@ -1,0 +1,11 @@
+spec:
+  containers:
+    - name: backend
+      image: <<REPOSITORY>>/spcs_authz
+  endpoints:
+    - name: backend
+      port: 8081
+serviceRoles:
+- name: backend
+  endpoints:
+  - backend
