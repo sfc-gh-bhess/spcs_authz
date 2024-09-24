@@ -39,6 +39,53 @@ This project includes 2 Docker images:
 * A router service, which is a configured nginx container to
   proxy to the backend service.
 
+### Details on nginx
+There are 2 things that we are doing with the nginx config
+
+#### Adding the scripts
+First, we are injecting some `<script>` tags at the end of
+the `<head>` block. The first loads the xhook library:
+```html
+<script src="//unpkg.com/xhook@latest/dist/xhook.min.js"></script>
+```
+
+The second uses the xhook library to intercept HTTP requests and copy
+the `Authorization` header into the `X-SPCS-Authorization` header. This
+will allow this header to not be stripped by SPCS:
+```html
+<script>
+  xhook.before(function(request) { 
+    if ("Authorization" in request.headers) {
+      request.headers["X-SPCS-Authorization"]=request.headers["Authorization"] 
+    }
+  });
+</script>
+```
+
+We do this by using the `sub_filter` directive to replace the `</head>`
+tag with these 2 `<script>` tags (and the `</head>` tag).
+
+#### Restoring the Authorization header
+The second thing we are doing is to copy the `X-SPCS-Authorization` header
+into the `Authorization` header. We can do this using the `map` and 
+`proxy_set_header` directives. 
+
+We use the `map` directive to set an internal variable to the value
+of the `X-SPCS-Authorization` header if it is present, or to the empty string.
+```
+  map $http_x_spcs_authorization $authz {
+    '~.' $http_x_spcs_authorization;
+    default '';
+  }
+```
+
+We then use this `$authz` variable to set the `Authorization` header to this
+value, if it is not the empty string:
+```
+  proxy_set_header Authorization $authz;
+```
+
+
 ## Configuration
 Use the included configuration script to set up the necessary
 resources with the proper value for the `IMAGE REPOSITORY`. To
