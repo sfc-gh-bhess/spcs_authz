@@ -161,7 +161,7 @@ CREATE SERVICE authz_backend
 spec:
   containers:
     - name: backend
-      image: sfsenorthamerica-bmh-prod3.registry.snowflakecomputing.com/sandbox/idea/repo1/spcs_authz
+      image: REPOSITORY_URL/spcs_authz
   endpoints:
     - name: backend
       port: 8001
@@ -188,7 +188,7 @@ CREATE SERVICE authz_router
 spec:
   containers:
     - name: router
-      image: sfsenorthamerica-bmh-prod3.registry.snowflakecomputing.com/sandbox/idea/repo1/spcs_authz_router
+      image: REPOSITORY_URL/spcs_authz_router
       args:
         - /=http://authz-backend:8001/
   endpoints:
